@@ -45,6 +45,8 @@ Open [http://localhost:3000](http://localhost:3000).
 Required for a real local run:
 
 - `DATABASE_URL`
+- `JOBFLOW_DATABASE_MODE` set to `true` only when database persistence is ready
+- `JOBFLOW_DEMO_USER_EMAIL` for the temporary auth boundary before Auth.js is wired
 - `NEXTAUTH_SECRET`
 - `APP_URL`
 - `ENCRYPTION_KEY`
@@ -76,6 +78,8 @@ npm run prisma:seed
 ```
 
 The seed creates Andrew, a default profile, a base resume, sample jobs, and application records.
+
+Mock interview CRM persistence is guarded by `JOBFLOW_DATABASE_MODE=true`. Until Auth.js is wired, persistence uses `JOBFLOW_DEMO_USER_EMAIL` as a TODO-safe local boundary instead of silently pretending production authentication exists.
 
 ## Google OAuth, Gmail, Drive, and Docs
 

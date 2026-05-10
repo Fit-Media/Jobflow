@@ -70,6 +70,7 @@ enum FollowUpType {
 enum MockInterviewMode {
   text
   voice
+  visual_avatar
 }
 
 enum MockInterviewStatus {
@@ -83,7 +84,7 @@ enum InterviewDifficulty {
   easy
   standard
   challenging
-  executive
+  tough_but_fair
 }
 
 enum InterviewerStyle {

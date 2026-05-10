@@ -32,3 +32,5 @@ Future integration suites should cover:
 - Microsoft OneDrive upload and Word Online links.
 - Headed Playwright form fill with final-submit blocking.
 - Voice fallback, transcript consent, audio consent, and delete controls.
+- Mock interview API validation, Prisma enum alignment, and consent-gated transcript/audio/video persistence.
+- Optional D-ID visual avatar fallback, AI-generated avatar disclosure, and video storage consent.
