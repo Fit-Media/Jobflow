@@ -26,13 +26,13 @@ CREATE TYPE "ApprovalStatus" AS ENUM ('pending', 'approved', 'rejected', 'edited
 CREATE TYPE "FollowUpType" AS ENUM ('application_follow_up', 'recruiter_reply', 'interview', 'closing_date', 'custom');
 
 -- CreateEnum
-CREATE TYPE "MockInterviewMode" AS ENUM ('text', 'voice');
+CREATE TYPE "MockInterviewMode" AS ENUM ('text', 'voice', 'visual_avatar');
 
 -- CreateEnum
 CREATE TYPE "MockInterviewStatus" AS ENUM ('planned', 'in_progress', 'completed', 'abandoned');
 
 -- CreateEnum
-CREATE TYPE "InterviewDifficulty" AS ENUM ('easy', 'standard', 'challenging', 'executive');
+CREATE TYPE "InterviewDifficulty" AS ENUM ('easy', 'standard', 'challenging', 'tough_but_fair');
 
 -- CreateEnum
 CREATE TYPE "InterviewerStyle" AS ENUM ('friendly', 'direct', 'behavioural', 'technical', 'recruiter', 'hiring_manager');
