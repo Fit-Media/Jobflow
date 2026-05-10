@@ -45,8 +45,7 @@ Open [http://localhost:3000](http://localhost:3000).
 Required for a real local run:
 
 - `DATABASE_URL`
-- `JOBFLOW_DATABASE_MODE` set to `true` only when database persistence is ready
-- `JOBFLOW_DEMO_USER_EMAIL` for the temporary auth boundary before Auth.js is wired
+- `DIRECT_URL`
 - `NEXTAUTH_SECRET`
 - `APP_URL`
 - `ENCRYPTION_KEY`
@@ -70,7 +69,18 @@ Model names are not hard-coded. If a model variable is missing, the AI service t
 
 ## Database setup
 
-Create a PostgreSQL database and set `DATABASE_URL`, then run:
+This project uses Supabase only as hosted PostgreSQL. Prisma remains the only database access layer.
+
+Set these in `.env.local`:
+
+- `DATABASE_URL`: the pooled Supabase Postgres connection used by the app, including `?pgbouncer=true`.
+- `DIRECT_URL`: the direct/session Supabase Postgres connection used by Prisma migrations.
+
+Do not use Supabase anon keys for database access in this app. Do not add Supabase Auth, Supabase middleware, or Supabase client queries.
+
+`.env.local` should contain real secrets and must not be committed to GitHub. Keep only safe placeholders in `.env.example`.
+
+Then run:
 
 ```bash
 npm run prisma:migrate
@@ -80,6 +90,8 @@ npm run prisma:seed
 The seed creates Andrew, a default profile, a base resume, sample jobs, and application records.
 
 Mock interview CRM persistence is guarded by `JOBFLOW_DATABASE_MODE=true`. Until Auth.js is wired, persistence uses `JOBFLOW_DEMO_USER_EMAIL` as a TODO-safe local boundary instead of silently pretending production authentication exists.
+
+If migrations fail because the remote Supabase database already has schema history, do not run a destructive reset. The safest fix is to inspect the existing `_prisma_migrations` table, back up the database, and use Prisma's migration-resolve workflow to mark already-applied migrations as applied before deploying new migrations.
 
 ## Google OAuth, Gmail, Drive, and Docs
 
