@@ -1,0 +1,540 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Provider {
+  google
+  microsoft
+}
+
+enum ResumeSourceType {
+  uploaded_pdf
+  uploaded_docx
+  google_doc
+  word_online
+  markdown
+}
+
+enum ApplicationMethod {
+  gmail
+  seek
+  linkedin
+  indeed
+  employer_site
+  government_portal
+  recruiter_site
+  other
+}
+
+enum DocumentType {
+  resume
+  cover_letter
+  selection_criteria
+  other
+}
+
+enum DocumentFormat {
+  google_doc
+  word_online
+  docx
+  pdf
+  markdown
+}
+
+enum RiskLevel {
+  low
+  medium
+  high
+}
+
+enum ApprovalStatus {
+  pending
+  approved
+  rejected
+  edited
+}
+
+enum FollowUpType {
+  application_follow_up
+  recruiter_reply
+  interview
+  closing_date
+  custom
+}
+
+enum MockInterviewMode {
+  text
+  voice
+}
+
+enum MockInterviewStatus {
+  planned
+  in_progress
+  completed
+  abandoned
+}
+
+enum InterviewDifficulty {
+  easy
+  standard
+  challenging
+  executive
+}
+
+enum InterviewerStyle {
+  friendly
+  direct
+  behavioural
+  technical
+  recruiter
+  hiring_manager
+}
+
+enum MockQuestionType {
+  behavioural
+  technical
+  motivation
+  company
+  role_specific
+  salary
+  availability
+  weakness
+  closing
+}
+
+enum Priority {
+  low
+  medium
+  high
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  connectedAccounts     ConnectedAccount[]
+  profile               UserProfile?
+  resumeSources         ResumeSource[]
+  coverLetterTemplates  CoverLetterTemplate[]
+  coverEmailTemplates   CoverEmailTemplate[]
+  jobs                  Job[]
+  applications          Application[]
+  applicationDocuments  ApplicationDocument[]
+  coverEmails           CoverEmail[]
+  gmailDrafts           GmailDraft[]
+  approvalItems         ApprovalItem[]
+  auditLogs             AuditLog[]
+  statusHistory         StatusHistory[]
+  followUps             FollowUp[]
+  screeningQuestions    ScreeningQuestion[]
+  browserSessions       BrowserSession[]
+  interviewPrep         InterviewPrep[]
+  mockInterviewSessions MockInterviewSession[]
+  interviewCoachingNote InterviewCoachingNote[]
+}
+
+model ConnectedAccount {
+  id                    String   @id @default(cuid())
+  userId                String
+  provider              Provider
+  encryptedAccessToken  String
+  encryptedRefreshToken String
+  scopes                String[]
+  expiresAt             DateTime?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UserProfile {
+  id                    String   @id @default(cuid())
+  userId                String   @unique
+  fullName              String
+  email                 String
+  phone                 String?
+  location              String?
+  linkedinUrl           String?
+  portfolioUrl          String?
+  githubUrl             String?
+  workRights            String?
+  visaStatus            String?
+  preferredJobTitles    String[]
+  preferredLocations    String[]
+  salaryExpectations    String?
+  noticePeriod          String?
+  willingnessToRelocate Boolean  @default(false)
+  certifications        String[]
+  skills                String[]
+  industries            String[]
+  summary               String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ResumeSource {
+  id              String           @id @default(cuid())
+  userId          String
+  title           String
+  type            ResumeSourceType
+  originalFileUrl String?
+  parsedText      String
+  structuredJson  Json?
+  isDefault       Boolean          @default(false)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model CoverLetterTemplate {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  body      String
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model CoverEmailTemplate {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  body      String
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Job {
+  id                  String    @id @default(cuid())
+  userId              String
+  title               String
+  company             String
+  recruiterName       String?
+  recruiterEmail      String?
+  sourcePlatform      String?
+  sourceEmailId       String?
+  sourceEmailThreadId String?
+  originalJobUrl      String?
+  savedJobDescription String?
+  jobDescriptionText  String
+  location            String?
+  salary              String?
+  jobType             String?
+  postedDate          DateTime?
+  closingDate         DateTime?
+  dateFound           DateTime  @default(now())
+  matchScore          Int?
+  recommendation      String?
+  mustHaveCriteria    String[]
+  desirableCriteria   String[]
+  keywords            String[]
+  status              String    @default("New")
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  applications         Application[]
+  applicationDocuments ApplicationDocument[]
+  coverEmails          CoverEmail[]
+  gmailDrafts          GmailDraft[]
+  approvalItems        ApprovalItem[]
+  auditLogs            AuditLog[]
+  statusHistory        StatusHistory[]
+  followUps            FollowUp[]
+  screeningQuestions   ScreeningQuestion[]
+  browserSessions      BrowserSession[]
+  interviewPrep        InterviewPrep[]
+  mockInterviewSession MockInterviewSession[]
+  coachingNotes        InterviewCoachingNote[]
+}
+
+model Application {
+  id                  String             @id @default(cuid())
+  userId              String
+  jobId               String
+  status              String             @default("New")
+  applicationMethod   ApplicationMethod?
+  appliedAt           DateTime?
+  followUpDate        DateTime?
+  followUpStatus      String?
+  confirmationEmailId String?
+  confirmationNumber  String?
+  notes               String?
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job                  Job                   @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  applicationDocuments ApplicationDocument[]
+  coverEmails          CoverEmail[]
+  gmailDrafts          GmailDraft[]
+  auditLogs            AuditLog[]
+  statusHistory        StatusHistory[]
+  followUps            FollowUp[]
+  browserSessions      BrowserSession[]
+  interviewPrep        InterviewPrep[]
+  mockInterviewSession MockInterviewSession[]
+}
+
+model ApplicationDocument {
+  id                   String         @id @default(cuid())
+  userId               String
+  jobId                String
+  applicationId        String?
+  type                 DocumentType
+  title                String
+  versionNumber        Int
+  format               DocumentFormat
+  fileUrl              String?
+  googleDocId          String?
+  microsoftDriveItemId String?
+  contentMarkdown      String?
+  approvedAt           DateTime?
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job         Job          @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  application Application? @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+}
+
+model CoverEmail {
+  id            String    @id @default(cuid())
+  userId        String
+  jobId         String
+  applicationId String?
+  subject       String
+  body          String
+  approvedAt    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job         Job          @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  application Application? @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+}
+
+model GmailDraft {
+  id                    String   @id @default(cuid())
+  userId                String
+  jobId                 String
+  applicationId         String?
+  gmailDraftId          String
+  toAddress             String   @map("to")
+  subject               String
+  body                  String
+  attachmentDocumentIds String[]
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job         Job          @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  application Application? @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+}
+
+model ApprovalItem {
+  id               String         @id @default(cuid())
+  userId           String
+  jobId            String?
+  type             String
+  title            String
+  description      String
+  riskLevel        RiskLevel
+  status           ApprovalStatus @default(pending)
+  proposedDataJson Json?
+  approvedDataJson Json?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job  Job? @relation(fields: [jobId], references: [id], onDelete: SetNull)
+}
+
+model AuditLog {
+  id            String   @id @default(cuid())
+  userId        String
+  jobId         String?
+  applicationId String?
+  action        String
+  detail        String
+  metadataJson  Json?
+  createdAt     DateTime @default(now())
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job         Job?         @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  application Application? @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+}
+
+model StatusHistory {
+  id            String   @id @default(cuid())
+  userId        String
+  jobId         String?
+  applicationId String?
+  fromStatus    String?
+  toStatus      String
+  note          String?
+  createdAt     DateTime @default(now())
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job         Job?         @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  application Application? @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+}
+
+model FollowUp {
+  id            String       @id @default(cuid())
+  userId        String
+  jobId         String
+  applicationId String?
+  dueDate       DateTime
+  completedAt   DateTime?
+  type          FollowUpType
+  title         String
+  notes         String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job         Job          @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  application Application? @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+}
+
+model ScreeningQuestion {
+  id              String   @id @default(cuid())
+  userId          String
+  jobId           String
+  question        String
+  suggestedAnswer String?
+  approvedAnswer  String?
+  confidence      Int
+  needsUserInput  Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job  Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+}
+
+model BrowserSession {
+  id                String   @id @default(cuid())
+  userId            String
+  jobId             String
+  applicationId     String?
+  url               String
+  status            String
+  fieldMappingsJson Json?
+  notes             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job         Job          @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  application Application? @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+}
+
+model InterviewPrep {
+  id                            String   @id @default(cuid())
+  userId                        String
+  jobId                         String
+  applicationId                 String?
+  likelyQuestionsJson           Json
+  suggestedTalkingPointsJson    Json
+  questionsAndrewCanAskJson     Json
+  roleSpecificPrepJson          Json
+  resumePointsToEmphasizeJson   Json
+  gapsToPrepareForJson          Json
+  createdAt                     DateTime @default(now())
+  updatedAt                     DateTime @updatedAt
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job         Job          @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  application Application? @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+}
+
+model MockInterviewSession {
+  id                    String               @id @default(cuid())
+  userId                String
+  jobId                 String
+  applicationId         String?
+  mode                  MockInterviewMode
+  status                MockInterviewStatus  @default(planned)
+  difficulty            InterviewDifficulty
+  interviewerStyle      InterviewerStyle
+  transcriptText        String?
+  audioRecordingUrl     String?
+  audioRecordingConsent Boolean              @default(false)
+  overallScore          Int?
+  feedbackSummary       String?
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+
+  user        User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job         Job                     @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  application Application?            @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+  questions   MockInterviewQuestion[]
+  answers     MockInterviewAnswer[]
+  notes       InterviewCoachingNote[]
+}
+
+model MockInterviewQuestion {
+  id                  String           @id @default(cuid())
+  sessionId           String
+  question            String
+  questionType        MockQuestionType
+  idealAnswerGuidance String
+  askedAt             DateTime?
+  createdAt           DateTime         @default(now())
+
+  session MockInterviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  answers MockInterviewAnswer[]
+}
+
+model MockInterviewAnswer {
+  id                   String   @id @default(cuid())
+  sessionId            String
+  questionId           String
+  answerText           String
+  transcriptSegment    String?
+  score                Int?
+  strengthsJson        Json?
+  improvementAreasJson Json?
+  suggestedBetterAnswer String?
+  fillerWordNotes      String?
+  clarityNotes         String?
+  confidenceNotes      String?
+  createdAt            DateTime @default(now())
+
+  session  MockInterviewSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  question MockInterviewQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+model InterviewCoachingNote {
+  id        String   @id @default(cuid())
+  userId    String
+  jobId     String?
+  sessionId String?
+  title     String
+  note      String
+  priority  Priority
+  createdAt DateTime @default(now())
+
+  user    User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job     Job?                  @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  session MockInterviewSession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+}
