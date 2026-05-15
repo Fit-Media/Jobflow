@@ -1,0 +1,3 @@
+export default function PrivacyPage() {
+  return <main className="min-h-screen bg-zinc-50 p-5 text-zinc-950"><section className="mx-auto max-w-3xl rounded-lg bg-white p-6 shadow-sm"><h1 className="text-4xl font-black">Privacy</h1><p className="mt-5 text-lg leading-8">Your personal workout notes, nutrition notes, goals and reflections are stored on this device only. Your club can only see basic progress information such as days completed, current day reached, challenge activity and whether you may need a check-in. We do not collect emails, phone numbers, surnames, health measurements or private journal content.</p></section></main>;
+}
