@@ -16,6 +16,15 @@ const safeMetadataKeys = new Set([
   "workoutNumber",
   "sizeBucket",
   "videoAttached",
+  "badgeId",
+  "checkInType",
+  "checkInWeek",
+  "checkInStreak",
+  "progressPhotoAdded",
+  "bodyScanAdded",
+  "measurementAdded",
+  "coachReviewRequested",
+  "bookletPageType",
   "isIOS",
   "supportsIndexedDB",
   "supportsVideoCapture",
@@ -59,6 +68,7 @@ export function sanitizeAnalyticsMetadata(metadata?: AnalyticsEvent["metadata"])
 export function hasPrivateAnalyticsLeak(event: Pick<AnalyticsEvent, "metadata">) {
   const metadata = event.metadata ?? {};
   return Object.entries(metadata).some(([key, value]) => {
+    if (safeMetadataKeys.has(key) && isSafePrimitive(value)) return false;
     const unsafeKey = forbiddenPrivateMarkers.some((marker) => key.toLowerCase().includes(marker.toLowerCase()));
     const unsafeSensitiveValue = ["medical", "injury", "weight", "measurement"].some((marker) => String(value ?? "").toLowerCase().includes(marker));
     return unsafeKey || unsafeSensitiveValue;

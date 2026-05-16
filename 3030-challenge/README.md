@@ -42,6 +42,7 @@ Stored locally only:
 - why, goals and reflections
 - workout, nutrition and daily notes
 - workout video attachments
+- Progress Vault check-ins, measurements, body scan values and progress photos
 - rituals, shopping list and prep actions
 - weekly review written answers
 - continuation journal content
@@ -56,6 +57,20 @@ Backend-safe data:
 
 The analytics helper in `src/lib/analytics/client.ts` has an explicit privacy guard comment. Do not add private text fields to analytics metadata.
 
+## Design and Motion
+
+The MVP uses a lightweight CSS animation system in `src/app/globals.css` rather than adding a motion dependency. This keeps the app fast on mobile and simple to deploy on Cloud Run.
+
+Motion principles:
+
+- subtle fade/slide/scale entrances
+- animated progress bars and badge glow moments
+- tap/hover lift for cards and buttons
+- no heavy confetti or distracting effects
+- `prefers-reduced-motion` is respected globally
+
+The visual system remains brand-neutral: charcoal, white, lime, teal, and a restrained purple accent. Public pages must never show outside brand names, agency marks, club identities, or a public club dropdown before club code validation.
+
 ## Local Storage Model
 
 Local keys:
@@ -66,6 +81,8 @@ Local keys:
 - `3030:analyticsQueue`
 
 Workout video attachments are stored in IndexedDB under `3030-workout-attachments`. They are not included in the JSON export/import flow.
+
+Progress photos are stored in IndexedDB under `3030-progress-photos`. Progress Vault check-in text and metric values are stored in the local workbook. Progress photo blobs are not included in JSON export/import.
 
 Export/import/reset are available from `/settings`.
 
@@ -132,6 +149,33 @@ Safe workout capture events:
 
 Allowed video/voice metadata is intentionally generic: field type, workout number, size bucket, and coarse browser capability flags. Do not send transcript text, file names, exact file sizes, object URLs, video content, workout text, nutrition text, reflections, goals or reasons.
 
+Safe Progress Vault events:
+
+- `progress_check_in_completed`
+- `progress_photo_added`
+- `body_scan_added`
+- `measurement_added`
+- `coach_review_requested`
+- `booklet_scan_started`
+
+Allowed Progress Vault metadata is yes/no and coarse only: check-in type, week number, check-in streak, photo added yes/no, body scan added yes/no, measurement added yes/no, coach review requested yes/no, and booklet page type. Do not send exact weight, measurements, body fat percentage, body scan values, private notes, photo blobs, photo file names or OCR text.
+
+## Progress Vault and Booklet Scanning
+
+`/progress` is an optional, privacy-first Progress Vault surface. It supports:
+
+- starting point or weekly check-ins
+- optional measurements
+- optional body scan metric fields and custom metric rows
+- energy, confidence, sleep and stress scores
+- weekly win, obstacle and next focus fields
+- optional local progress photos
+- a future-facing booklet scan/OCR concept
+
+Progress Vault language should focus on progress, energy, confidence, strength and consistency. Avoid body-shaming, diagnosis and medical/nutrition claims. Body scan metrics are informational estimates only.
+
+Booklet scanning is scaffolded as a product concept only. The intended future flow is: user photographs a Starting Point page, Weekly Check-In page or body scan report; OCR/AI extracts values; the app shows a confirmation screen; the user edits and confirms before saving locally. Do not auto-share extracted values with a club or coach.
+
 ## Adding Clubs
 
 For MVP, add records to `src/lib/clubs/seed.ts`. In production, move this to Supabase/Firebase and validate credentials only through a server route.
@@ -151,7 +195,7 @@ Replace this with Supabase Auth, Firebase Auth or another provider before launch
 
 ## Deployment Notes
 
-Set production environment variables for the selected backend and move demo seed validation out of source code. Keep white-label branding disabled by default. Do not add public club dropdowns or public client branding.
+Set production environment variables for the selected backend and move demo seed validation out of source code. Keep white-label branding disabled by default. Do not add public club dropdowns or public-facing third-party marks.
 
 Current Cloud Run demo service:
 

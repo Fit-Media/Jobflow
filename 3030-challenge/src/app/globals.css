@@ -16,10 +16,16 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
 }
 
-button, a, input, textarea {
+button, a, input, textarea, select {
   -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: #bef264;
+  color: #18181b;
 }
 
 input[type="checkbox"] {
@@ -36,6 +42,61 @@ input[type="checkbox"] {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes slide-up-fade {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes badge-glow {
+  0% {
+    box-shadow: 0 0 0 rgba(163, 230, 53, 0);
+    transform: scale(0.98);
+  }
+  45% {
+    box-shadow: 0 0 34px rgba(163, 230, 53, 0.34);
+    transform: scale(1.03);
+  }
+  100% {
+    box-shadow: 0 0 0 rgba(163, 230, 53, 0);
+    transform: scale(1);
+  }
+}
+
+@keyframes progress-sheen {
+  from {
+    transform: translateX(-110%);
+  }
+  to {
+    transform: translateX(110%);
+  }
+}
+
+@keyframes subtle-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
   }
 }
 
@@ -64,6 +125,22 @@ input[type="checkbox"] {
   animation: soft-enter 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+.animate-slide-up {
+  animation: slide-up-fade 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-scale-in {
+  animation: scale-in 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-badge-glow {
+  animation: badge-glow 900ms ease-out both;
+}
+
+.animate-subtle-float {
+  animation: subtle-float 5s ease-in-out infinite;
+}
+
 .animate-soft-pulse {
   animation: soft-pulse 700ms ease-out both;
 }
@@ -73,12 +150,12 @@ input[type="checkbox"] {
 }
 
 .interactive-lift {
-  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, background-color 180ms ease;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, background-color 180ms ease, color 180ms ease;
 }
 
 .interactive-lift:hover {
   transform: translateY(-2px);
-  box-shadow: 0 14px 32px rgba(24, 24, 27, 0.08);
+  box-shadow: 0 16px 38px rgba(24, 24, 27, 0.1);
 }
 
 .tap-scale {
@@ -87,6 +164,38 @@ input[type="checkbox"] {
 
 .tap-scale:active {
   transform: scale(0.98);
+}
+
+.premium-card {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.94)),
+    radial-gradient(circle at 12% 0%, rgba(190, 242, 100, 0.22), transparent 34%),
+    radial-gradient(circle at 100% 8%, rgba(45, 212, 191, 0.16), transparent 28%);
+}
+
+.dark-product-bg {
+  background:
+    radial-gradient(circle at 18% 12%, rgba(163, 230, 53, 0.18), transparent 30%),
+    radial-gradient(circle at 88% 8%, rgba(45, 212, 191, 0.18), transparent 28%),
+    radial-gradient(circle at 72% 82%, rgba(168, 85, 247, 0.12), transparent 30%),
+    #09090b;
+}
+
+.progress-track {
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-track::after {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  content: "";
+  inset: 0;
+  position: absolute;
+  transform: translateX(-110%);
+}
+
+.progress-track[data-animated="true"]::after {
+  animation: progress-sheen 1.8s ease-out 450ms both;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -100,5 +209,13 @@ input[type="checkbox"] {
   .interactive-lift:hover,
   .tap-scale:active {
     transform: none;
+  }
+
+  .animate-subtle-float {
+    animation: none !important;
+  }
+
+  .progress-track::after {
+    display: none;
   }
 }

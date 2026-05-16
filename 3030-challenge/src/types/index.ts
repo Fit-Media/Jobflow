@@ -114,6 +114,68 @@ export type WeeklyReview = {
   completedAt?: string;
 };
 
+export type ProgressCustomMetric = {
+  name: string;
+  value: string;
+  unit: string;
+};
+
+export type ProgressCheckIn = {
+  id: string;
+  type: "starting_point" | "weekly";
+  weekNumber?: number;
+  date: string;
+  weight?: string;
+  waist?: string;
+  hips?: string;
+  chest?: string;
+  arm?: string;
+  thigh?: string;
+  bodyFatPercentage?: string;
+  muscleMass?: string;
+  skeletalMuscleMass?: string;
+  visceralFatRating?: string;
+  biologicalAge?: string;
+  bmr?: string;
+  bodyWater?: string;
+  leanBodyMass?: string;
+  bodyCompositionScore?: string;
+  energyScore?: number;
+  confidenceScore?: number;
+  sleepScore?: number;
+  stressScore?: number;
+  mainGoal?: string;
+  weeklyWin?: string;
+  weeklyObstacle?: string;
+  nextWeekFocus?: string;
+  customMetrics: ProgressCustomMetric[];
+  shareWithCoachRequested: boolean;
+  source: "manual" | "booklet_scan";
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ProgressPhotoAttachment = {
+  id: string;
+  checkInId: string;
+  angle: "before" | "front" | "side" | "back" | "weekly" | "scan_page";
+  fileName: string;
+  mimeType: string;
+  size: number;
+  createdAt: string;
+  localBlobKey: string;
+};
+
+export type ProgressVault = {
+  checkIns: ProgressCheckIn[];
+  privacyMode: "private" | "coach_review_requested";
+  bookletScanDraft?: {
+    status: "not_started" | "captured" | "needs_confirmation";
+    pageType?: "starting_point" | "weekly_check_in" | "body_scan_report";
+    capturedAt?: string;
+  };
+};
+
 export type Workbook = {
   why: {
     desiredResults: string[];
@@ -131,8 +193,14 @@ export type Workbook = {
   prepActions: string[];
   days: DayEntry[];
   weeklyReviews: WeeklyReview[];
+  progressVault: ProgressVault;
   continuationChoice?: string;
-  settings: { remindersEnabled: boolean; minimumMode: boolean };
+  settings: {
+    remindersEnabled: boolean;
+    minimumMode: boolean;
+    savedHacks?: string[];
+    tryTodayHacks?: string[];
+  };
   badges: string[];
   version: number;
 };
@@ -147,7 +215,10 @@ export type AnalyticsEventType =
   | "settings_opened" | "challenge_completed_30" | "challenge_extended" | "coaching_interest_selected"
   | "inactive_3_days" | "inactive_7_days" | "add_to_home_prompt_shown" | "add_to_home_completed"
   | "voice_input_started" | "voice_input_completed" | "video_attachment_added" | "video_attachment_removed"
-  | "video_attachment_opened" | "video_attachment_played" | "video_attachment_failed";
+  | "video_attachment_opened" | "video_attachment_played" | "video_attachment_failed"
+  | "badge_unlocked" | "progress_check_in_completed" | "progress_photo_added"
+  | "body_scan_added" | "measurement_added" | "coach_review_requested"
+  | "booklet_scan_started";
 
 export type AnalyticsEvent = {
   eventId: string;

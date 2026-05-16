@@ -247,11 +247,11 @@ export function WorkoutCaptureField({
         />
       </label>
       <div className="grid min-w-0 gap-2 sm:flex sm:flex-wrap">
-        <Button type="button" data-testid={`voice-${fieldKey}`} variant={isListening ? "dark" : "outline"} className="min-h-11 px-3" onClick={isListening ? stopVoiceInput : startVoiceInput} title={capabilities.supportsVoiceInput ? "Dictate this field" : "Voice input may not be supported on this browser"}>
+        <Button type="button" data-testid={`voice-${fieldKey}`} variant={isListening ? "dark" : "outline"} className="min-h-11 px-3" onClick={isListening ? stopVoiceInput : startVoiceInput} title={capabilities.supportsVoiceInput ? "Dictate this field" : "Voice input may not be supported on this browser"} aria-label={`${isListening ? "Stop dictating" : "Dictate"} ${label}`}>
           {isListening ? <MicOff size={18} /> : <Mic size={18} />}
           {isListening ? "Listening..." : "Dictate"}
         </Button>
-        <Button type="button" data-testid={`video-${fieldKey}`} variant="outline" className="min-h-11 px-3" onClick={() => fileInputRef.current?.click()} disabled={isVideoBusy}>
+        <Button type="button" data-testid={`video-${fieldKey}`} variant={attachment ? "soft" : "outline"} className="min-h-11 px-3" onClick={() => fileInputRef.current?.click()} disabled={isVideoBusy} aria-label={`${attachment ? "Replace" : "Add"} video for ${label}`}>
           <Video size={18} />
           {attachment ? "Replace video" : "Add video"}
         </Button>
@@ -269,7 +269,7 @@ export function WorkoutCaptureField({
       <p className="text-xs font-bold leading-5 text-zinc-500">Short clips work best - aim for 10-30 seconds. {capabilities.isIOS ? "On iPhone, this opens the native camera or video picker." : "Use Add video to record or choose a clip."}</p>
       {message ? <p className="rounded-lg bg-amber-50 p-3 text-sm font-bold leading-6 text-amber-900">{message}</p> : null}
       {attachment ? (
-        <div className="animate-soft-enter grid min-w-0 gap-3 rounded-lg border border-zinc-200 bg-zinc-50 p-3">
+        <div className="animate-soft-enter grid min-w-0 gap-3 rounded-lg border border-teal-100 bg-white p-3 shadow-sm shadow-zinc-950/[0.04]">
           <div className="flex min-w-0 items-start gap-3">
             <div className="grid size-11 shrink-0 place-items-center rounded-lg bg-zinc-950 text-lime-300"><Play size={18} /></div>
             <div className="min-w-0">
@@ -280,7 +280,7 @@ export function WorkoutCaptureField({
             </div>
           </div>
           <video
-            className="max-h-64 w-full rounded-lg bg-zinc-950"
+            className="aspect-video max-h-64 w-full rounded-lg bg-zinc-950 object-contain"
             src={attachment.objectUrl}
             controls
             playsInline
@@ -290,9 +290,9 @@ export function WorkoutCaptureField({
           />
           {playbackMessage ? <p className="rounded-lg bg-amber-50 p-3 text-sm font-bold leading-6 text-amber-900">{playbackMessage}</p> : null}
           <div className="grid gap-2 sm:grid-cols-3">
-            <Button type="button" variant="soft" onClick={openVideo}><Play size={18} />Open video</Button>
-            <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}><RefreshCcw size={18} />Replace</Button>
-            <Button type="button" variant="danger" onClick={removeVideo} disabled={isVideoBusy}><Trash size={18} />Remove</Button>
+            <Button type="button" variant="soft" onClick={openVideo} aria-label={`Open video for ${label}`}><Play size={18} />Open video</Button>
+            <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} aria-label={`Replace video for ${label}`}><RefreshCcw size={18} />Replace</Button>
+            <Button type="button" variant="danger" onClick={removeVideo} disabled={isVideoBusy} aria-label={`Remove video for ${label}`}><Trash size={18} />Remove</Button>
           </div>
         </div>
       ) : null}

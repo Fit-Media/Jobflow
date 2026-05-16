@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 function metric(label: string, value: string | number, detail: string) {
   return (
-    <Card>
+    <Card className="interactive-lift">
       <p className="text-sm font-bold text-zinc-500">{label}</p>
       <p className="mt-2 text-3xl font-black">{value}</p>
       <p className="mt-1 text-xs font-bold text-zinc-500">{detail}</p>
@@ -16,12 +16,13 @@ function metric(label: string, value: string | number, detail: string) {
 
 function AdminShell({ label, title, children }: { label: string; title: string; children: React.ReactNode }) {
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#fafafa_0%,#f4f4f5_100%)] p-5 text-zinc-950">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_12%_0%,rgba(190,242,100,0.16),transparent_28%),radial-gradient(circle_at_88%_6%,rgba(45,212,191,0.12),transparent_26%),linear-gradient(180deg,#fafafa_0%,#f4f4f5_100%)] p-5 text-zinc-950">
       <section className="mx-auto grid max-w-7xl gap-5">
-        <header className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-zinc-950 p-5 text-white">
+        <header className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-zinc-950 p-5 text-white shadow-2xl shadow-zinc-950/15">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-300">{label}</p>
             <h1 className="mt-2 text-3xl font-black sm:text-4xl">{title}</h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-300">Progress patterns, check-in opportunities and commercial signals without exposing private workbook content.</p>
           </div>
           <Button><Download size={18} />Export CSV</Button>
         </header>
@@ -58,6 +59,7 @@ export function PlatformDashboard() {
         {metric("Participants", demoParticipants.length, "Across demo clubs")}
         {metric("Completion rate", `${Math.round((completed / demoParticipants.length) * 100)}%`, "30-day finishers")}
         {metric("Coaching interest", coachingInterest, "Follow-up opportunities")}
+        {metric("Check-in rate", "68%", "Weekly progress vault demo")}
       </div>
       <div className="grid gap-4 lg:grid-cols-[1fr_1fr]">
         <Card>
@@ -67,7 +69,7 @@ export function PlatformDashboard() {
           </div>
           <div className="mt-4 grid gap-2">
             {seedClubs.map((club, index) => (
-              <div key={club.clubId} className="grid gap-3 rounded-lg bg-zinc-50 p-3 sm:grid-cols-[1fr_auto] sm:items-center">
+              <div key={club.clubId} className="grid gap-3 rounded-lg border border-zinc-200 bg-zinc-50 p-3 sm:grid-cols-[1fr_auto] sm:items-center">
                 <div>
                   <p className="font-black">{club.clubName}</p>
                   <p className="text-sm text-zinc-600">{club.licenceStatus} licence</p>
@@ -93,6 +95,7 @@ export function PlatformDashboard() {
         <InsightCard icon={AlertTriangle} title="Clubs needing support" copy="Watch clubs with no recent participants, low Day 1 completion or poor Week 1 review completion." tone="warning" />
         <InsightCard icon={Activity} title="Most common drop-off" copy="The demo data points to early challenge friction around Day 6 and the first weekly review." />
         <InsightCard icon={Users} title="Suggested upsell opportunities" copy="Coaching/PT interest is visible without exposing private workbook content." tone="teal" />
+        <InsightCard icon={BarChart3} title="Progress Vault opportunity" copy="Track check-in completion, photo usage and coach review requests without exposing exact measurements or photos." tone="teal" />
       </div>
     </AdminShell>
   );
@@ -110,6 +113,7 @@ export function ClubDashboard() {
         {metric("Active participants", demoParticipants.length - inactive3.length, "Used app in last 3 days")}
         {metric("Needs check-in", inactive3.length, "Inactive 3+ days")}
         {metric("Coaching interest", coachingInterest.length, "Staff action list")}
+        {metric("Coach review requests", 3, "Progress Vault opt-in")}
       </div>
       <div className="grid gap-4 xl:grid-cols-[1.25fr_.75fr]">
         <Card>
@@ -136,14 +140,14 @@ export function ClubDashboard() {
               </thead>
               <tbody>
                 {demoParticipants.map((participant) => (
-                  <tr key={participant.participantId} className="border-b last:border-0">
+                  <tr key={participant.participantId} className="border-b last:border-0 hover:bg-zinc-50">
                     <td className="py-3 font-black">{participant.firstName}</td>
                     <td>{participant.currentDayReached}</td>
                     <td>{participant.totalDaysCompleted}</td>
                     <td>{participant.currentStreak}</td>
-                    <td><span className="rounded-full bg-zinc-100 px-2 py-1 text-xs font-black">{participant.challengeStatus}</span></td>
+                    <td><span className={cn("rounded-full px-2 py-1 text-xs font-black", participant.challengeStatus === "completed_30" ? "bg-lime-100 text-lime-900" : participant.challengeStatus === "inactive" ? "bg-amber-100 text-amber-900" : "bg-zinc-100 text-zinc-700")}>{participant.challengeStatus}</span></td>
                     <td><span className={cn("rounded-full px-2 py-1 text-xs font-black", participant.inactiveRiskLevel === "low" ? "bg-lime-100 text-lime-900" : "bg-amber-100 text-amber-900")}>{participant.inactiveRiskLevel === "low" ? "No" : "Yes"}</span></td>
-                    <td>{participant.coachingInterestSelected ? "Yes" : "No"}</td>
+                    <td><span className={cn("rounded-full px-2 py-1 text-xs font-black", participant.coachingInterestSelected ? "bg-purple-100 text-purple-900" : "bg-zinc-100 text-zinc-600")}>{participant.coachingInterestSelected ? "Yes" : "No"}</span></td>
                     <td>No</td>
                   </tr>
                 ))}
@@ -156,6 +160,7 @@ export function ClubDashboard() {
           <InsightCard icon={AlertTriangle} title={`${inactive3.length} need a check-in`} copy="Prioritise participants inactive for 3+ days, then anyone with zero current streak." tone="warning" />
           <InsightCard icon={CheckCircle2} title={`${completed.length} completed 30 days`} copy="Finishers are strong candidates for 45/45, 60/60 or a coaching conversation." tone="success" />
           <InsightCard icon={MessageSquare} title={`${coachingInterest.length} selected coaching/PT`} copy="Use the script below to start a helpful next-step conversation." tone="teal" />
+          <InsightCard icon={BarChart3} title="Weekly check-in insight" copy="Progress Vault can show completion rates, missed check-ins and coach review requests without revealing photos, weight or body scan values." tone="teal" />
         </div>
       </div>
       <Card>

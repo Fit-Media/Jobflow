@@ -33,7 +33,8 @@ export function defaultWorkbook(): Workbook {
     prepActions: [],
     days: Array.from({ length: 30 }, (_, index): DayEntry => ({ dayNumber: index + 1, plannedWorkoutMovement: "", plannedNutritionHabit: "", workoutComplete: false, habitComplete: false, privateNote: "", updatedAt: now })),
     weeklyReviews: [1, 2, 3, 4].map((weekNumber) => ({ weekNumber, daysRange: `${(weekNumber - 1) * 7 + 1}-${Math.min(weekNumber * 7, 30)}`, whatWentWell: "", whatCanImprove: "", biggestWins: "", top3Rituals: "", daysCompletedThisWeek: 0 })),
-    settings: { remindersEnabled: false, minimumMode: false },
+    progressVault: { checkIns: [], privacyMode: "private", bookletScanDraft: { status: "not_started" } },
+    settings: { remindersEnabled: false, minimumMode: false, savedHacks: [], tryTodayHacks: [] },
     badges: [],
     version: 1,
   };
@@ -82,7 +83,14 @@ export function createOrUpdateProfile(input: Partial<ParticipantProfile> & { fir
 
 export function getWorkbook() {
   const existing = read<Workbook>(workbookKey);
-  if (existing) return existing;
+  if (existing) {
+    const settings = existing.settings ?? { remindersEnabled: false, minimumMode: false };
+    return {
+      ...existing,
+      progressVault: existing.progressVault ?? { checkIns: [], privacyMode: "private", bookletScanDraft: { status: "not_started" } },
+      settings: { ...settings, savedHacks: settings.savedHacks ?? [], tryTodayHacks: settings.tryTodayHacks ?? [] },
+    };
+  }
   const workbook = defaultWorkbook();
   write(workbookKey, workbook);
   return workbook;
